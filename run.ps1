@@ -4,9 +4,19 @@ $jfx = 'C:\Users\angry\Downloads\openjfx-21.0.8_windows-x64_bin-sdk\javafx-sdk-2
 
 # Compile
 Write-Host "Compiling..."
-javac --module-path $jfx --add-modules javafx.controls,javafx.graphics -d bin src/DrawApp.java
+# Prefer the Maven source layout if present
+if (Test-Path "src/main/java/DrawApp.java") {
+	$src = "src/main/java/DrawApp.java"
+} else {
+	$src = "src/DrawApp.java"
+}
+javac --module-path $jfx --add-modules javafx.controls,javafx.graphics -d bin $src
 if ($LASTEXITCODE -ne 0) { Write-Error "Compilation failed (exit $LASTEXITCODE)"; exit $LASTEXITCODE }
 
-# Run
+# Run (use fully-qualified class name if the source declares a package)
 Write-Host "Running..."
-java --module-path $jfx --add-modules javafx.controls,javafx.graphics -cp bin DrawApp
+if (Test-Path "src/main/java/DrawApp.java") {
+	java --module-path $jfx --add-modules javafx.controls,javafx.graphics -cp bin main.java.DrawApp
+} else {
+	java --module-path $jfx --add-modules javafx.controls,javafx.graphics -cp bin DrawApp
+}
