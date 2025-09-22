@@ -1,6 +1,5 @@
-// run cmd:
-// C:\Users\angry\OneDrive\Documents\MitchelSkulas_Draw\.maven\apache-maven-3.9.6\bin\mvn.cmd -DskipTests javafx:run
-
+// Does not run normally, has to use a command. Sorry about that.
+// run cmd: (whatever path you have this saved to)\MitchelSkulas_Draw\.maven\apache-maven-3.9.6\bin\mvn.cmd -DskipTests javafx:run    
 package main.java;
 
 import javafx.application.Application;
@@ -8,10 +7,10 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Toggle;
@@ -28,6 +27,7 @@ public class DrawApp extends Application {
     // single ToggleGroup for shape buttons so only one can be selected
     private ToggleGroup shapeButtons;
     private Slider sizeSlider;
+    public int shapeCount = 0;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -47,8 +47,8 @@ public class DrawApp extends Application {
     // constrain size so VBox doesn't expand to fill the StackPane
     controls.setMaxWidth(160);
     controls.setPrefWidth(160);
-    controls.setMaxHeight(140);
-    controls.setPrefHeight(140);
+    controls.setMaxHeight(160);
+    controls.setPrefHeight(160);
     controls.setStyle("-fx-padding: 8; -fx-background-color: rgba(255,255,255,0.9); -fx-border-color: #333; -fx-border-width: 1; -fx-background-radius: 4;");
     controls.setSpacing(6);
         //add radio buttons for shape selection
@@ -70,14 +70,24 @@ public class DrawApp extends Application {
         });
 
         //create size slider (use the field)
-        Label sizeLabel = new Label("Size:");
+        Label sizeLabel = new Label("Size: " + 10);
         this.sizeSlider = new Slider(1, 100, 10);
         this.sizeSlider.setPrefWidth(120);
         this.sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             System.out.println("Selected size: " + newValue.intValue());
+            sizeLabel.setText("Size: " + newValue.intValue());
         });
 
-    controls.getChildren().addAll(shapeLabel, circleButton, squareButton, sizeLabel, this.sizeSlider);
+        //add clear button
+        Button clearButton = new Button("Clear " + 0 + " Shapes");
+        clearButton.setOnAction(e -> {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            shapeCount = 0;
+            clearButton.setText("Clear " + 0 + " Shapes");
+        });
+
+    controls.getChildren().addAll(shapeLabel, circleButton, squareButton, sizeLabel, this.sizeSlider, clearButton);
     // add controls on top of the canvas and align to top-left
     // Wrap controls in an AnchorPane so they don't grow with the StackPane
     javafx.scene.layout.AnchorPane anchor = new javafx.scene.layout.AnchorPane();
@@ -88,6 +98,35 @@ public class DrawApp extends Application {
     root.getChildren().add(anchor);
     StackPane.setAlignment(anchor, Pos.TOP_LEFT);
     controls.toFront();
+
+    // Handle mouse events for drawing
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+    canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+        public void drawShape(GraphicsContext gc, double x, double y) {
+            Toggle selectedToggle = shapeButtons.getSelectedToggle();
+            if (selectedToggle != null) {
+                RadioButton selectedButton = (RadioButton) selectedToggle;
+                String shape = selectedButton.getText();
+                double size = sizeSlider.getValue();
+                gc.setFill(Color.BLUE);
+                if (shape.equals("Circle")) {
+                    gc.fillOval(x - size / 2, y - size / 2, size, size);
+                } else if (shape.equals("Square")) {
+                    gc.fillRect(x - size / 2, y - size / 2, size, size);
+                }
+            }
+            shapeCount++;
+            if (shapeCount == 1) {
+                clearButton.setText("Clear " + shapeCount + " Shape");
+            } else {
+                clearButton.setText("Clear " + shapeCount + " Shapes");
+            }
+        }
+        @Override
+        public void handle(MouseEvent event) {
+            drawShape(gc, event.getX(), event.getY());
+        }
+    });
 	}
 	public static void main(String[] args) {
 		launch(args);
