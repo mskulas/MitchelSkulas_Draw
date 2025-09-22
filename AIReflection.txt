@@ -1,0 +1,19 @@
+AI REFLECTION:
+
+I used copilot considerably more than I usually do.
+I did use the autocomplete feature, but encountered several problems integrating javafx.
+I used copilot to integrate files and structure the project so it would actually compile, but I do think I need to do more research to be able to consistently make projects that compile without relying on it.
+I also used it to troubleshoot when elements refused to appear or broke the program.
+A list of my prompts is below.
+
+help me run javafx (i didn't know what was wrong at the time so used an intentionally vague prompt)
+Error: JavaFX runtime components are missing, and are required to run this application (copy and pasted error message)
+run DrawApp.java using Maven
+Install Maven (prompts my friend used that worked)
+Terminal still reports JavaFX runtime components are missing, meaning DrawApp.java is still not runnable. How can I fix this issue? (never fully fixed hence the program only running with a command)
+shapeButtons is allowing multiple RadioButtons to be selected at once. How can I fix this?
+The slider element is not showing in the program. How can I fix this?
+the controls VBox is taking up the full screen. I need it to be smaller and in the top left corner but nothing seems to be working.
+An error occurred while compiling, saying it cannot find the javafx symbol "Button". I don't know how to fix this.
+
+I also want to work on organizing my code to make it more readable because the later portions of it were a headache.
